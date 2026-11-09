@@ -71,7 +71,11 @@ bike_count(): повертає кількість велосипедів на с
 
 --- Ролі та файли-- 
 Роль	Файл	   Що в ньому
+
 1	   bikes.py	  класи Bicycle і Station
+
 2	   client.py	клас Client 
+
 3	   road.py	  
+
 4	   main.py	  main(), тестові дані
