@@ -26,4 +26,5 @@ def make_trip(client: Client, start_station: Station, end_station: Station, bike
 #повернути поточний заробіток
 def get_total_revenue():
   return total_revenue
-  
+
+
