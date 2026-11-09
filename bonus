@@ -1,14 +1,14 @@
 def trip(client, start, end, bike_type, minutes):
     name = client.get_name()
     number = start.find_bike(bike_type)
-    
     if number is None:
-        if bike_type == ELECTRIC and len(start.low_charge_bikes()) > 0:
-            return f"{name}: на станції {start.name} немає придатних велосипедів (заряд нижче 20%)"
+        for bike in start.bikes:
+            if bike.bike_type == ELECTRIC and bike.charge < 20:
+                return f"{name}: на станції {start.name} немає {TYPE_NAMES[bike_type]} велосипедів (усі нижче 20%)"
         return f"{name}: на станції {start.name} 0 {TYPE_NAMES[bike_type]} велосипедів"
 
     before = get_total_revenue()
     if make_trip(client, start, end, number, minutes):
-        cost = get_total_revenue() - before
-        return f"{name}: {bike_type} велосипед, зі станції {start.name} на станцію {end.name}, {minutes} хв, {cost:g} грн"
-    return f"{name}: не вистачає грошей на поїздку"
+        money = get_total_revenue() - before
+        return f"{name}: {bike_type} велосипед, зі станції {start.name} на станцію {end.name}, {minutes} хв, {money} грн"
+    return f"{name}: не вистачає грошей"
