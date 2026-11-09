@@ -18,7 +18,7 @@ def make_trip(client: Client, start_station: Station, end_station: Station, bike
   if client.money_paid(price):
         total_revenue += price
         return True
-    else:
+  else:
         return False
 
 
