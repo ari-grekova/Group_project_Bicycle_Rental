@@ -1,88 +1,14 @@
-from bikes import Bicycle, Station
-from client import Client
-from road import make_trip, get_total_revenue
-
-REGULAR = "звичайний"
-ELECTRIC = "електричний"
-TYPE_NAMES = {REGULAR: "звичайних", ELECTRIC: "електричних"}
-
-
 def trip(client, start, end, bike_type, minutes):
     name = client.get_name()
-
     number = start.find_bike(bike_type)
+    
     if number is None:
-        if bike_type == ELECTRIC and start.bike_count() > 0:
-            return f"{name}: на станції {start.name} немає {TYPE_NAMES[bike_type]} велосипедів (усі нижче 20%)"
+        if bike_type == ELECTRIC and len(start.low_charge_bikes()) > 0:
+            return f"{name}: на станції {start.name} немає придатних велосипедів (заряд нижче 20%)"
         return f"{name}: на станції {start.name} 0 {TYPE_NAMES[bike_type]} велосипедів"
 
     before = get_total_revenue()
     if make_trip(client, start, end, number, minutes):
         cost = get_total_revenue() - before
-        return (f"{name}: {bike_type} велосипед, зі станції {start.name} "
-                f"на станцію {end.name}, {minutes} хв, {cost:g} грн")
-    return f"{name}: не вистачило грошей"
-
-
-def report(stations):
-    print("Звіт адміністратора:")
-    for station in stations:
-        print(f"Станція {station.name}: велосипедів {station.bike_count()}")
-
-    print("\nЕлектричні велосипеди з низьким зарядом (<20%):")
-    low_battery = False
-    for station in stations:
-        for bike in station.get_bikes():
-            if bike.type == ELECTRIC and bike.charge < 20:
-                print(f"  - Велосипед №{bike.number} на станції {station.name}, заряд: {bike.charge}%")
-                low_battery = True
-    if not low_battery:
-        print("  (немає)")
-
-    print(f"\nЗагальна виручка: {get_total_revenue():g} грн")
-
-
-def run_checks():
-    assert Bicycle(1, REGULAR).cost(10) == 20
-    assert Bicycle(2, ELECTRIC, charge=100).cost(10) == 50
-    assert Station("порожня", []).take_bike(1) is None
-    low_bike = Bicycle(5, ELECTRIC, charge=15)
-    assert low_bike.charge < 20
-
-
-def main():
-    station_1 = Station("1", [
-        Bicycle(1, REGULAR),
-        Bicycle(2, ELECTRIC, charge=80),
-        Bicycle(3, REGULAR)
-    ])
-    station_2 = Station("2", [
-        Bicycle(4, ELECTRIC, charge=10),
-        Bicycle(5, ELECTRIC, charge=50)
-    ])
-    stations = [station_1, station_2]
-
-    kristina = Client("Крістіна", 500)
-    yarik = Client("Ярік", 120)
-
-    print("початковий стан:")
-    for station in stations:
-        print(f"станція {station.name}: велосипедів — {station.bike_count()}")
-
-    print("\nПоїздки:")
-    print(trip(kristina, station_2, station_1, ELECTRIC, 20))
-    print(trip(yarik, station_2, station_1, ELECTRIC, 10))
-    print(trip(yarik, station_1, station_2, REGULAR, 15))
-    print(trip(kristina, station_1, station_2, ELECTRIC, 40))
-
-    print("\nБаланси:")
-    for client in (kristina, yarik):
-        print(f"{client.get_name()}: {client.get_balance()} грн")
-
-    print()
-    report(stations)
-
-
-if __name__ == "__main__":
-    run_checks()
-    main()
+        return f"{name}: {bike_type} велосипед, зі станції {start.name} на станцію {end.name}, {minutes} хв, {cost:g} грн"
+    return f"{name}: не вистачає грошей на поїздку"
