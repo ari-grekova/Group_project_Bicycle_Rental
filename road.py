@@ -15,10 +15,10 @@ def make_trip(client: Client, start_station: Station, end_station: Station, bike
   end_station.return_bike(bike)
 
   #списати гроші + порахувати заробіток
-  if client.money_paid(price):
+  if client.deduct_balance(price):
         total_revenue += price
         return True
-  else:
+    else:
         return False
 
 
